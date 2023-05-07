@@ -1,0 +1,35 @@
+name: Deploy app and test
+
+on:
+    push:
+        branches: ["main"]
+    workflow_dispatch:
+
+jobs:
+    deploy-app:
+        runs-on: ubuntu-latest
+    
+        steps:
+            - uses: action/checkout@V3
+
+            - name: step infra
+              run: echo "infrastructure setup"
+            
+            - name: build application
+              run: echo "build application"
+        
+    notify-downstream:
+        runs-on: ubuntu-latest
+        name: Notify test repositories that deployment is completed
+        needs: deploy-app
+        strategy:
+            matrix:
+                repos: [suneel944/UAF]
+        steps:
+            - name: Dispatch event on ${{ matrix.repos }}
+              uses: peter-evans/repository-dispatch@V2
+              with:
+                token: ${{ secrets.REPO_ACCESS_TOKEN_TO_TRIGGER_EVENTS }}
+                repository: ${{ matrix.repos }}
+                event-type: deployment-completed-event
+                client-payload: '{ "github": ${{ toJson(github) }}, "TEST_ENV": "MAIN", "TAG": ${{ github.event.repository.name }}}'
