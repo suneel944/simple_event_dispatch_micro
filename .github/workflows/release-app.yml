@@ -14,8 +14,9 @@ jobs:
 
             - name: Create release branch
               uses: peterjgrainger/action-create-branch@v2.0.1
+              env:
+                TOKEN: ${{ secrets.REPO_ACCESS }}
               with:
-                token: ${{ secrets.REPO_ACCESS }}
                 branch: release/app-${{ github.run_number }}
               
             - name: Deploy app
