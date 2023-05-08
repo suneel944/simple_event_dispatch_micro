@@ -1,0 +1,21 @@
+name: Release app
+
+on:
+    repository_dispatch:
+      types: [ release-app-to-prod ] 
+    workflow_dispatch:
+
+jobs:
+    deploy-app:
+        runs-on: ubuntu-latest
+    
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Create release branch
+              run: |
+                git checkout -b release/app-${{ github.run_number }}
+                git push origin release/app-${{ github.run_number }}
+            
+            - name: Deploy app
+              run: echo "App deployed successfully!!"
